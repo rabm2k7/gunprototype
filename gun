@@ -1,0 +1,44 @@
+# run orc
+#!/bin/sh
+OLDPATH=$PATH
+WHEREAMI=`pwd`
+NODEARCH=`uname -m`
+
+DARWIN_FLAG=`uname -a | grep "Darwin"`
+
+if [ ! -d "$WHEREAMI/nodejs-runtime" ]; then
+  git clone https://github.com/internetofcoins/nodejs-v8-lts
+fi
+
+if [ ! -L "$WHEREAMI/node" ]; then
+  ln -s "./nodejs-v8-lts/$NODEARCH" "$WHEREAMI/node"
+fi
+
+if [ "$DARWIN_FLAG" != "" ]; then
+ # fix node for eat Apple
+ rm ./node
+ ln -s "./nodejs-v8-lts/darwin-x64" "$WHEREAMI/node"
+fi
+
+#if [ ! -x "$WHEREAMI/.git/hooks/pre-push" ]; then
+#  cp ./hooks/pre-push ./.git/hooks/pre-push
+#  chmod +x ./.git/hooks/pre-push
+#fi
+
+#if [ ! -x "$WHEREAMI/.git/hooks/commit-msg" ]; then
+#  cp ./hooks/commit-msg ./.git/hooks/commit-msg
+#  chmod +x ./.git/hooks/commit-msg
+#fi
+
+export PATH=$WHEREAMI/node/bin:"$PATH"
+NODEINST=`which node`
+
+echo
+echo "Starting chat..."
+echo " [i] using node executable $NODEINST"
+node server.js
+echo
+echo
+
+PATH=$OLDPATH
+
