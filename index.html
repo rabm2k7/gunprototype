@@ -1,0 +1,52 @@
+<html>
+
+<body>
+  <div id="messageBox"></div>
+  <form><input><button>Send Message</button></form>
+
+  <form id="formSelector">
+    <select name="roomID">
+      <option value="number1">Room1</option>
+      <option value="number2">Room2</option>
+      <option value="number3">Room3</option>
+</select>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script>
+    var gun = Gun("http://localhost:8080/gun")
+
+    var currentRoom = "number1";
+
+    $('#formSelector').on('change', function(event) {
+      var roomSelection = $('#formSelector').find('select')
+      currentRoom = roomSelection.val();
+      var messagebox = $('#messageBox')
+      messagebox.html("");
+      gun.get(currentRoom).map().on(function(message) {
+        messagebox.append('<p>' + message + '</p>')
+      });
+    });
+
+    $('form').on('submit', function(event) {
+      var input = $('form').find('input')
+      var objectInput = {
+        [Date.now()]: input.val()
+      }
+      console.log(objectInput);
+      gun.get(currentRoom).put(objectInput);
+      input.val('')
+      event.preventDefault()
+    })
+
+    gun.get(currentRoom).map().on(function(message) {
+      var messagebox = $('#messageBox')
+      messagebox.append('<p>' + message + '</p>')
+    });
+
+
+  </script>
+</body>
+
+</html>
