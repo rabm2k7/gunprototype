@@ -1,31 +1,59 @@
 <html>
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="jquery-1.12.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/webtorrent/0.96.4/webtorrent.min.js"></script>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 <body>
-  <div id="messageBox"></div>
-  <form><input><button>Send Message</button></form>
+  <style>
+  .makeAniceBorder{
+    border: 1px solid #000;
+  }
+  </style>
+  <script type="text/javascript">
+    var initialRooms = [];
+    initialRooms[0] = "Room0";
+    initialRooms[1] = "Room1";
+    initialRooms[2] = "Room2";
+    initialRooms[3] = "Room3";
+    initialRooms[4] = "Room4";
 
+    for (var i = 0; i < initialRooms.length; i++) {
+      document.write('<div class="makeAniceBorder" id="messageBox'+ initialRooms[i] +'"></div>')
+    }
+  </script>
+
+  <form><input><button>Send Message</button></form>
   <form id="formSelector">
     <select name="roomID">
-      <option value="number1">Room1</option>
-      <option value="number2">Room2</option>
-      <option value="number3">Room3</option>
-</select>
+      <script type="text/javascript">
+      for (var i = 0; i < initialRooms.length; i++) {
+      document.write('<option value="Room'+ i +'">Room'+ i +'</option>');
+      }
+</script>
+
+    </select>
   </form>
 
-  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-  <script>
-    var gun = Gun("http://localhost:8080/gun")
 
-    var currentRoom = "number1";
+  <script type="text/javascript">
+    var gun = Gun("http://localhost:8080/gun");
+
+    var currentRoom = initialRooms[0];
+    var locString;
 
     $('#formSelector').on('change', function(event) {
       var roomSelection = $('#formSelector').find('select')
       currentRoom = roomSelection.val();
-      var messagebox = $('#messageBox')
+      locString = "#messageBox" + currentRoom.toString();
+      console.log(locString);
+      var messagebox = $(locString);
       messagebox.html("");
       gun.get(currentRoom).map().on(function(message) {
-        messagebox.append('<p>' + message + '</p>')
+        messagebox.append('<p>' + message + '</p>');
       });
     });
 
@@ -37,14 +65,15 @@
       console.log(objectInput);
       gun.get(currentRoom).put(objectInput);
       input.val('')
-      event.preventDefault()
+      event.preventDefault();
     })
 
     gun.get(currentRoom).map().on(function(message) {
-      var messagebox = $('#messageBox')
+      locString = "#messageBox" + currentRoom.toString();
+      var messagebox = $(locString);
+      console.log(messagebox);
       messagebox.append('<p>' + message + '</p>')
     });
-
 
   </script>
 </body>
